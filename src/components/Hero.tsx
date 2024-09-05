@@ -21,7 +21,7 @@ const Hero = () => {
           <div className="mt-8 flex flex-wrap justify-center gap-4">
             <a
               className="block w-1/2rounded bg-primary px-10 py-3 text-sm font-medium text-white shadow hover:bg-primary/80 focus:outline-none active:bg-primary/80 sm:w-auto"
-              href="/Dashboard"  // Update to the appropriate route
+              href="/sign-up"  // Update to the appropriate route
             >
               Get Started
             </a>
