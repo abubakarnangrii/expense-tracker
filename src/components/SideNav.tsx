@@ -44,7 +44,7 @@ const SideNav = () => {
         {menuList.map((menu) => (
           <Link key={menu.id} href={menu.path}>
             <h2
-              className={`flex items-center gap-2 font-medium p-5 cursor-pointer rounded  hover:text-primary hover:bg-primary/20 ${
+              className={`flex items-center gap-2 font-medium p-5 cursor-pointer rounded  hover:text-primary hover:bg-primary/20 mb-2 ${
                 pathname === menu.path
                   && "text-primary bg-primary/20"}`}
             >
