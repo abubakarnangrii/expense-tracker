@@ -9,5 +9,5 @@ if (!dbUrl) {
 }
 
 const sql = neon(dbUrl);
-const db = drizzle(sql,{schema});
+export const db = drizzle(sql,{schema});
 
