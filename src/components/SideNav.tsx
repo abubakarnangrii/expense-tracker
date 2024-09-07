@@ -8,7 +8,6 @@ import path from "path";
 
 const SideNav = () => {
   const pathname = usePathname();
-  console.log(pathname);
   const menuList = [
     {
       id: 1,

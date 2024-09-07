@@ -5,47 +5,59 @@ import GroupField from "./GroupField";
 import * as Yup from "yup";
 import { Formik, Form } from "formik";
 import Button from "./Button";
-import Loader from "./Loader";
+import Loader from "../../../../../components/Loader";
+import EmojiPicker from "emoji-picker-react";
+import { Budgets } from "../../../../../../utils/scheme";
+import { db } from "../../../../../../utils/dbConfig";
+import { toast } from "sonner";
 
 interface NewBudgetModalProps {
   isOpen: boolean;
   onClose: () => void;
+  handleBudgetUpdate:()=> void;
 }
 
 interface FormValues {
   budgetName: string;
   budgetPrice: string;
-  budgetEmoji: string;
 }
 
-const NewBudgetModal: React.FC<NewBudgetModalProps> = ({ isOpen, onClose }) => {
+const NewBudgetModal: React.FC<NewBudgetModalProps> = ({ isOpen, onClose ,handleBudgetUpdate}) => {
   const [loading, setLoading] = useState<boolean>(false);
+  const [emojiOpen, setEmojiOpen] = useState<boolean>(false);
+  const [emoji, setEmoji] = useState<string>("🥰");
 
   if (!isOpen) return null;
 
   const initialValues: FormValues = {
     budgetName: "",
     budgetPrice: "",
-    budgetEmoji: "",
   };
 
   const validationSchema = Yup.object({
     budgetName: Yup.string().required("Budget name is required"),
     budgetPrice: Yup.number().required("Budget price is required"),
-    budgetEmoji: Yup.string().required("Budget emoji is required"),
   });
 
   const onSubmit = async (values: FormValues) => {
     setLoading(true);
     try {
-      // Simulate a network request or data submission
-      await new Promise((resolve) => setTimeout(resolve, 10000));
-      console.log(values);
-      onClose(); // Close the modal after successful submission
+      const result = await db.insert(Budgets)
+      .values({
+        name: values.budgetName,
+        amount: values.budgetPrice,
+        createdBy: "abubakar",
+        icon: emoji,
+      }).returning({inseredId:Budgets.id})
+      if(result){
+        toast("New Budget created")
+        handleBudgetUpdate();
+        onClose();
+      }
     } catch (error) {
-      console.error("Submission error:", error);
+      toast(`Error: ${error}`);
     } finally {
-      setLoading(false); // Ensure loading state is turned off
+      setLoading(false);
     }
   };
 
@@ -67,12 +79,31 @@ const NewBudgetModal: React.FC<NewBudgetModalProps> = ({ isOpen, onClose }) => {
                   className="bg-slate-50 hover:bg-primary/20 cursor-pointer rounded-full"
                 />
               </div>
+              <div className="w-full py-2">
+                <button
+                  type="button"
+                  onClick={() => setEmojiOpen(!emojiOpen)}
+                  className={` ring-1 rounded text-white text-lg py-2 px-8  mt-4 relative h-10 shadow cursor-pointer bg-slate-50 `}
+                >
+                  {emoji}
+                </button>
+                <div className="absolute bg-slate-100  z-50">
+                  <EmojiPicker
+                    open={emojiOpen}
+                    onEmojiClick={(e) => {
+                      setEmoji(e.emoji);
+                      setEmojiOpen(false);
+                    }}
+                  />
+                </div>
+              </div>
+
               <GroupField
                 label="Budget Name"
                 name="budgetName"
                 id="budgetName"
                 type="text"
-                placeholder="Enter budget name"
+                placeholder="e.g Shopping"
                 value={values.budgetName}
                 onChange={handleChange}
                 error={
@@ -86,7 +117,7 @@ const NewBudgetModal: React.FC<NewBudgetModalProps> = ({ isOpen, onClose }) => {
                 name="budgetPrice"
                 id="budgetPrice"
                 type="number"
-                placeholder="678"
+                placeholder="e.g $500"
                 value={values.budgetPrice}
                 onChange={handleChange}
                 error={
@@ -95,20 +126,7 @@ const NewBudgetModal: React.FC<NewBudgetModalProps> = ({ isOpen, onClose }) => {
                     : ""
                 }
               />
-              <GroupField
-                label="Budget Emoji"
-                name="budgetEmoji"
-                id="budgetEmoji"
-                type="text"
-                placeholder="Enter emoji"
-                value={values.budgetEmoji}
-                onChange={handleChange}
-                error={
-                  touched.budgetEmoji && errors.budgetEmoji
-                    ? errors.budgetEmoji
-                    : ""
-                }
-              />
+
               <Button type="submit" disabled={loading}>
                 {loading ? <Loader /> : "Create Budget"}
               </Button>

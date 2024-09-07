@@ -9,7 +9,7 @@ const Button: React.FC<{
     <button
       type={type}
       disabled={disabled}
-      className={`bg-primary text-white py-2 px-4 rounded mt-4 relative h-10 w-full ${
+      className={`bg-primary text-white py-2 px-4  mt-4 relative h-10 w-full ${
         disabled ? "cursor-not-allowed" : "cursor-pointer"
       }`}
     >
