@@ -7,7 +7,7 @@ import BudgetItem from "../../../../../components/BudgetItem";
 import AddExpense from "@/components/AddExpense";
 import ExpensesTable from "@/components/ExpensesTable";
 
-const page:React.FC = () => {
+const ExpensesItem:React.FC = () => {
   const router = useRouter();
   const { id } = useParams();
   const [data, setData] = useState({
@@ -74,4 +74,4 @@ const page:React.FC = () => {
   );
 };
 
-export default page;
+export default ExpensesItem;
