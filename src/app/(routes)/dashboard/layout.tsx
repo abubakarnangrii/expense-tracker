@@ -1,4 +1,4 @@
-'use client'
+"use client";
 
 import SideNav from "../../../components/SideNav";
 import DashboardHeader from "@/components/DashboardHeader";
@@ -25,7 +25,8 @@ export default function DashboardLayout({
 
   const createUserBudget = async () => {
     try {
-      const result = await db.select()
+      const result = await db
+        .select()
         .from(Budgets)
         .where(eq(Budgets.createdBy, user.primaryEmailAddress.emailAddress));
 
@@ -36,7 +37,7 @@ export default function DashboardLayout({
       console.error("Failed to fetch budgets:", error);
       // Handle errors, maybe redirect to an error page or show a notification
     }
-  }
+  };
 
   return (
     <div className="flex justify-start items-start flex-row">

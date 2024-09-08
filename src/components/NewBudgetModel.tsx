@@ -5,10 +5,10 @@ import GroupField from "./GroupField";
 import * as Yup from "yup";
 import { Formik, Form } from "formik";
 import Button from "./Button";
-import Loader from "../../../../../components/Loader";
+import Loader from "./Loader";
 import EmojiPicker from "emoji-picker-react";
-import { Budgets } from "../../../../../../utils/scheme";
-import { db } from "../../../../../../utils/dbConfig";
+import { Budgets } from "../../utils/scheme";
+import { db } from "../../utils/dbConfig";
 import { toast } from "sonner";
 
 interface NewBudgetModalProps {

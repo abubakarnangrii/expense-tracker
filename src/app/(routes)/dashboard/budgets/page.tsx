@@ -1,13 +1,14 @@
 "use client";
 
-import ExpenseCard from "@/app/(routes)/dashboard/budgets/_components/BudgetItem";
-import NewBudgetModal from "@/app/(routes)/dashboard/budgets/_components/NewBudgetModel"; // Corrected import
+import ExpenseCard from "@/components/BudgetItem";
+import NewBudgetModal from "@/components/NewBudgetModel"; // Corrected import
 import { Plus } from "lucide-react";
 import React, { useEffect, useState } from "react";
 import { db } from "../../../../../utils/dbConfig";
 import { desc, eq, getTableColumns, sql } from "drizzle-orm";
 import { Budgets, Expenses } from "../../../../../utils/scheme";
 import Loader from "@/components/Loader";
+import Breadcrumb from "@/components/Breadcrumb";
 
 interface BudgetList {
   id: number;
@@ -58,7 +59,11 @@ const Budget: React.FC = () => {
 
   return (
     <div className="p-4 relative">
-      <h1 className="text-3xl font-semibold mb-4">My Budgets</h1>
+      <div className="flex flex-col justify-center items-center py-4 gap-2">
+      <h1 className="text-3xl font-semibold">My Budgets</h1>
+      <Breadcrumb name={"Budgets"} link={'budgets'}/>
+      </div>
+
       <div className="grid grid-cols-1 w-full md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-4">
         <div
           onClick={handleNewBudget}

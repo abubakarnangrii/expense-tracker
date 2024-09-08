@@ -1,13 +1,17 @@
 "use client";
 
-import React from 'react'
+import Breadcrumb from "@/components/Breadcrumb";
+import React from "react";
 
 const Upgrade = () => {
   return (
-    <div>
-      <h1 className='text-3xl font-semibold p-4'>Upgrade</h1>
+    <div className="p-4">
+      <div className="flex flex-col justify-center items-center py-4 gap-2">
+        <h1 className="text-3xl font-semibold">Upgrade</h1>
+        <Breadcrumb name={"Upgrade"} link={"upgrade"} />
+      </div>
     </div>
-  )
-}
+  );
+};
 
-export default Upgrade
+export default Upgrade;
