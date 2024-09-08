@@ -30,7 +30,7 @@ const NotFound: React.FC = () => {
           Uh-oh!
         </h1>
 
-        <p className="mt-4 text-gray-500">We can't find that page.</p>
+        <p className="mt-4 text-gray-500">{`We can't find that page.`}</p>
         <Link
           className="group relative inline-block text-sm font-semibold text-primary focus:outline-none active:text-primary mt-6"
           href="/"
