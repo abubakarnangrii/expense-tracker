@@ -34,7 +34,7 @@ const Budget: React.FC = () => {
 
   useEffect(() => {
     getBudgets();
-  }, []);
+  });
 
   const getBudgets = async () => {
     try {

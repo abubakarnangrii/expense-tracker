@@ -37,7 +37,7 @@ const Dashboard = () => {
     <div>
       <div className="p-4">
         <h1 className="text-3xl font-semibold">Hi, Abu Bakar</h1>
-        <p>here's what happping with your money, Lets Manage your expenses</p>
+        <p>{`here's what happping with your money, Lets Manage your expenses`}</p>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 py-4 px-4">
