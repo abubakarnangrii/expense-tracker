@@ -9,6 +9,8 @@ import ExpensesTable from "@/components/ExpensesTable";
 import { db } from "../../../../../../utils/dbConfig";
 import { Budgets, Expenses } from "../../../../../../utils/scheme";
 import { desc, eq, getTableColumns, sql } from "drizzle-orm";
+import { toast } from "sonner";
+import DeleteBudget from "@/components/DeleteBudget";
 
 interface Budget {
   id: number;
@@ -23,11 +25,13 @@ interface Budget {
 const ExpensesItem: React.FC = ({ params }) => {
   const router = useRouter();
   const { id } = params;
-  const [data, setData] = useState<Budget>();
+  const [budgetsData, setBudgetsData] = useState<Budget>();
+  const [expensesData, setExpensesData] = useState();
+  const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
 
   useEffect(() => {
     getBudgetInfo();
-    console.log(id);
+    getExpanseList();
   }, [id]);
 
   const getBudgetInfo = async () => {
@@ -47,8 +51,7 @@ const ExpensesItem: React.FC = ({ params }) => {
         .groupBy(Budgets.id);
 
       if (result) {
-        setData(result[0]);
-        console.log("Budget Info:", result); // Added more descriptive log message
+        setBudgetsData(result[0]);
       } else {
         console.log("No results found.");
       }
@@ -57,13 +60,43 @@ const ExpensesItem: React.FC = ({ params }) => {
     }
   };
 
+  const getExpanseList = async () => {
+    try {
+      const result = await db
+        .select()
+        .from(Expenses)
+        .where(eq(Expenses.budgetId, Number(id)))
+        .orderBy(desc(Expenses.id));
+      if (result) {
+        setExpensesData(result);
+      } else {
+        console.log("No results found.");
+      }
+    } catch (error) {
+      console.error("Error fetching expenses list:", error);
+    }
+  };
+
   const handleEdit = () => {
     alert("Edit");
   };
 
-  const handleDelete = () => {
-    alert("Delete");
+  const handleDelete = async (id: number) => {
+    try {
+      const result = await db
+        .delete(Budgets)
+        .where(eq(Budgets.id, id))
+        .returning();
+      if (result) {
+        toast("Budgets deleted");
+        setIsModalOpen(false);
+        router.back();
+      }
+    } catch (error) {
+      toast(`Error: ${error}`);
+    }
   };
+
   const handleBack = () => {
     router.back();
   };
@@ -87,16 +120,23 @@ const ExpensesItem: React.FC = ({ params }) => {
           </button>
           <button
             type={"submit"}
-            onClick={handleDelete}
+            onClick={() => setIsModalOpen(true)}
             className={`bg-red-500 rounded text-white py-2 px-4  relative h-10  cursor-pointer flex justify-center items-center gap-3 hover:bg-red-600`}
           >
             <BeerIcon size="24" /> <span>Delete</span>
           </button>
+
+          <DeleteBudget
+            isOpen={isModalOpen}
+            onClose={() => setIsModalOpen(false)}
+            onConfirm={() => handleDelete(id)}
+            message="Are you sure you want to delete this expense?"
+          />
         </div>
       </div>
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 py-8">
-        {data ? (
-          <BudgetItem budget={data} />
+        {budgetsData ? (
+          <BudgetItem budget={budgetsData} />
         ) : (
           [1].map((item, index) => (
             <div
@@ -105,11 +145,15 @@ const ExpensesItem: React.FC = ({ params }) => {
             ></div>
           ))
         )}
-        <AddExpense budgetId={id} refreshData= {()=>getBudgetInfo()}/>
+        <AddExpense
+          budgetId={id}
+          refreshBudget={() => getBudgetInfo()}
+          refreshExpanses={getExpanseList}
+        />
       </div>
       <div className="pb-10 pt-4">
         <h1 className="text-2xl font-semibold pb-3">Latest Expenses</h1>
-        <ExpensesTable />
+        <ExpensesTable expenses={expensesData} refreshTable={getExpanseList} />
       </div>
     </div>
   );

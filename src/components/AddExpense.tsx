@@ -10,15 +10,23 @@ import EmojiPicker from "emoji-picker-react";
 import { Budgets, Expenses } from "../../utils/scheme";
 import { db } from "../../utils/dbConfig";
 import { toast } from "sonner";
+import moment from "moment";
 
 interface FormValues {
   expenseName: string;
   expensePrice: string;
 }
 
-const AddExpense: React.FC<{ budgetId: number; refreshData: () => void }> = ({
+interface AddExpenseProps{ 
+  budgetId: number; 
+  refreshBudget: () => void ;
+  refreshExpanses: () => void ;
+}
+
+const AddExpense: React.FC<AddExpenseProps> = ({
   budgetId,
-  refreshData,
+  refreshBudget,
+  refreshExpanses
 }) => {
   const [loading, setLoading] = useState<boolean>(false);
 
@@ -41,13 +49,14 @@ const AddExpense: React.FC<{ budgetId: number; refreshData: () => void }> = ({
           name: values.expenseName,
           amount: values.expensePrice,
           budgetId: budgetId,
-          createdAt: "abubakar",
+          createdAt: moment().format('DD/MM/YYYY'),
         })
         .returning({ inseredId: Budgets.id });
       if (result) {
         console.log(JSON.stringify(result));
         toast("New Expense created");
-        refreshData();
+        refreshBudget();
+        refreshExpanses();
         (values.expenseName = ""), (values.expensePrice = "");
       }
     } catch (error) {

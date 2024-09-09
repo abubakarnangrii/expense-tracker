@@ -1,8 +1,42 @@
 "use client";
 import { BeerIcon } from "lucide-react";
 import React from "react";
+import { db } from "../../utils/dbConfig";
+import { Expenses } from "../../utils/scheme";
+import { eq } from "drizzle-orm";
+import { toast } from "sonner";
 
-const ExpensesTable: React.FC = () => {
+interface Expanses {
+  id: number;
+  name: string;
+  amount: string;
+  createdAt: string;
+  budgetId: number;
+}
+
+interface ExpansesTableProps {
+  expenses: Expanses[];
+  refreshTable: () => void;
+}
+
+const ExpensesTable: React.FC<ExpansesTableProps> = ({
+  expenses,
+  refreshTable,
+}) => {
+  const handleDelete = async (expense: Expanses) => {
+    try {
+      const result = await db
+        .delete(Expenses)
+        .where(eq(Expenses.id, expense.id))
+        .returning();
+      if (result) {
+        toast("Expanse deleted");
+        refreshTable();
+      }
+    } catch (error) {
+      toast(`Error: ${error}`);
+    }
+  };
   return (
     <div className="rounded-lg border border-gray-200">
       <div className="overflow-x-auto rounded-t-lg">
@@ -25,24 +59,30 @@ const ExpensesTable: React.FC = () => {
           </thead>
 
           <tbody className="divide-y divide-gray-200">
-            <tr >
-              <td className="whitespace-nowrap px-4 py-2 font-medium text-gray-900">
-                John Doe
-              </td>
-              <td className="whitespace-nowrap px-4 py-2 text-gray-700">
-                24/05/1995
-              </td>
-              <td className="whitespace-nowrap px-4 py-2 text-gray-700">
-                Web Developer
-              </td>
-              <td className="whitespace-nowrap px-4 py-2 text-red-500">
-               <BeerIcon size="24" onClick={()=>{alert("delete")}} />
-              </td>
-            </tr>
+            {expenses?.map((expanse: Expanses) => (
+              <tr key={expanse.id}>
+                <td className="whitespace-nowrap px-4 py-2 font-medium text-gray-900">
+                  {expanse.name}
+                </td>
+                <td className="whitespace-nowrap px-4 py-2 text-gray-700">
+                  {expanse.amount}
+                </td>
+                <td className="whitespace-nowrap px-4 py-2 text-gray-700">
+                  {expanse.createdAt}
+                </td>
+                <td className="whitespace-nowrap px-4 py-2 text-red-500">
+                  <BeerIcon
+                    size="24"
+                    onClick={() => {
+                      handleDelete(expanse);
+                    }}
+                  />
+                </td>
+              </tr>
+            ))}
           </tbody>
         </table>
       </div>
-
     </div>
   );
 };
