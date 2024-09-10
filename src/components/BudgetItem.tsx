@@ -13,16 +13,17 @@ interface Budget {
 
 interface BudgetItemProps {
   budget: Budget;
+  className?:string;
 }
 
-const BudgetItem: React.FC<BudgetItemProps> = ({ budget }) => {
+const BudgetItem: React.FC<BudgetItemProps> = ({ budget,className }) => {
   const Calculte = (amount: number, budget: number) => {
     return amount - budget;
   };
 
   return (
     <Link href={'/dashboard/expenses/'+budget?.id}>
-      <div className="rounded w-full  p-4 ring ring-indigo-50 sm:p-6 lg:p-8 bg-slate-50 hover:shadow-md cursor-pointer">
+      <div className={`rounded w-full  p-4 ring ring-indigo-50 sm:p-6 lg:p-8 bg-slate-50 hover:shadow-md cursor-pointer ${className}`}>
         <div className="flex items-center justify-between gap-4 sm:gap-8 mb-4">
           <div className="flex items-center gap-4">
             <div
