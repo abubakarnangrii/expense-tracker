@@ -25,7 +25,7 @@ interface NewBudgetModalProps {
   isOpen: boolean;
   onClose: () => void;
   handleBudgetUpdate: () => void;
-  budgetsData: Budget;
+  budgetsData?: Budget;
 }
 
 interface FormValues {
