@@ -36,7 +36,6 @@ const GroupField: React.FC<GroupFieldProps> = ({
             {label}
           </label>
         )}
-        <div className="relative">
         <input
           type={type}
           name={name}
@@ -47,8 +46,6 @@ const GroupField: React.FC<GroupFieldProps> = ({
           min={min}
           className="mt-1 py-2 px-6 bg-slate-100 block w-full border-none ring-0 outline-none  shadow-sm  focus:ring-1 focus:ring-opacity-50"
         />
-        {name === "budgetPrice" && <span className="absolute top-2 left-2.5 text-black/60">$</span>}
-        </div>
       </div>
       {error && <p className="text-red-500 text-sm mt-1" >{error}</p>}
     </>

@@ -1,6 +1,13 @@
 "use client";
 
-import { ArrowLeft, BeerIcon, DeleteIcon, Edit } from "lucide-react";
+import {
+  ArrowLeft,
+  BeerIcon,
+  DeleteIcon,
+  Edit,
+  Trash,
+  Trash2Icon,
+} from "lucide-react";
 import { useParams, useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
 import BudgetItem from "../../../../../components/BudgetItem";
@@ -11,6 +18,7 @@ import { Budgets, Expenses } from "../../../../../../utils/scheme";
 import { desc, eq, getTableColumns, sql } from "drizzle-orm";
 import { toast } from "sonner";
 import DeleteBudget from "@/components/DeleteBudget";
+import NewBudgetModal from "@/components/NewBudgetModel";
 
 interface Budget {
   id: number;
@@ -28,6 +36,7 @@ const ExpensesItem: React.FC = ({ params }) => {
   const [budgetsData, setBudgetsData] = useState<Budget>();
   const [expensesData, setExpensesData] = useState();
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
+  const [EditModalOpen, setEditModalOpen] = useState<boolean>(false);
 
   useEffect(() => {
     getBudgetInfo();
@@ -78,23 +87,33 @@ const ExpensesItem: React.FC = ({ params }) => {
   };
 
   const handleEdit = () => {
-    alert("Edit");
+    setEditModalOpen(true);
   };
 
   const handleDelete = async (id: number) => {
     try {
-      const result = await db
-        .delete(Budgets)
-        .where(eq(Budgets.id, id))
+      const deleteExpanses = await db
+        .delete(Expenses)
+        .where(eq(Expenses.budgetId, id))
         .returning();
-      if (result) {
-        toast("Budgets deleted");
-        setIsModalOpen(false);
-        router.back();
+      if (deleteExpanses) {
+        const result = await db
+          .delete(Budgets)
+          .where(eq(Budgets.id, id))
+          .returning();
+        if (result) {
+          toast("Budgets deleted !!");
+          setIsModalOpen(false);
+          router.back();
+        }
       }
     } catch (error) {
       toast(`Error: ${error}`);
     }
+  };
+
+  const handleCloseEdit = () => {
+    setEditModalOpen(false);
   };
 
   const handleBack = () => {
@@ -123,7 +142,7 @@ const ExpensesItem: React.FC = ({ params }) => {
             onClick={() => setIsModalOpen(true)}
             className={`bg-red-500 rounded text-white py-2 px-4  relative h-10  cursor-pointer flex justify-center items-center gap-3 hover:bg-red-600`}
           >
-            <BeerIcon size="24" /> <span>Delete</span>
+            <Trash2Icon size="24" /> <span>Delete</span>
           </button>
 
           <DeleteBudget
@@ -134,6 +153,14 @@ const ExpensesItem: React.FC = ({ params }) => {
           />
         </div>
       </div>
+      {EditModalOpen && (
+        <NewBudgetModal
+          isOpen={EditModalOpen}
+          onClose={handleCloseEdit}
+          handleBudgetUpdate={getBudgetInfo}
+          budgetsData={budgetsData}
+        />
+      )}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 py-8">
         {budgetsData ? (
           <BudgetItem budget={budgetsData} />

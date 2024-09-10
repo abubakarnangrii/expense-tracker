@@ -10,11 +10,22 @@ import EmojiPicker from "emoji-picker-react";
 import { Budgets } from "../../utils/scheme";
 import { db } from "../../utils/dbConfig";
 import { toast } from "sonner";
+import { eq } from "drizzle-orm";
 
+interface Budget {
+  id: number;
+  name: string;
+  amount: string;
+  icon: string | null;
+  createdBy: string;
+  totalSpend: number;
+  totalItem: number;
+}
 interface NewBudgetModalProps {
   isOpen: boolean;
   onClose: () => void;
-  handleBudgetUpdate:()=> void;
+  handleBudgetUpdate: () => void;
+  budgetsData: Budget;
 }
 
 interface FormValues {
@@ -22,16 +33,23 @@ interface FormValues {
   budgetPrice: string;
 }
 
-const NewBudgetModal: React.FC<NewBudgetModalProps> = ({ isOpen, onClose ,handleBudgetUpdate}) => {
+const NewBudgetModal: React.FC<NewBudgetModalProps> = ({
+  isOpen,
+  onClose,
+  handleBudgetUpdate,
+  budgetsData,
+}) => {
   const [loading, setLoading] = useState<boolean>(false);
   const [emojiOpen, setEmojiOpen] = useState<boolean>(false);
-  const [emoji, setEmoji] = useState<string>("🥰");
+  const [emoji, setEmoji] = useState<string | null>(
+    budgetsData ? budgetsData?.icon : "🥰"
+  );
 
   if (!isOpen) return null;
 
   const initialValues: FormValues = {
-    budgetName: "",
-    budgetPrice: "",
+    budgetName: budgetsData?.name || "",
+    budgetPrice: budgetsData?.amount || "",
   };
 
   const validationSchema = Yup.object({
@@ -39,18 +57,20 @@ const NewBudgetModal: React.FC<NewBudgetModalProps> = ({ isOpen, onClose ,handle
     budgetPrice: Yup.number().required("Budget price is required"),
   });
 
-  const onSubmit = async (values: FormValues) => {
+  const handleAddBudget = async (values: FormValues) => {
     setLoading(true);
     try {
-      const result = await db.insert(Budgets)
-      .values({
-        name: values.budgetName,
-        amount: values.budgetPrice,
-        createdBy: "abubakar",
-        icon: emoji,
-      }).returning({inseredId:Budgets.id})
-      if(result){
-        toast("New Budget created")
+      const result = await db
+        .insert(Budgets)
+        .values({
+          name: values.budgetName,
+          amount: values.budgetPrice,
+          createdBy: "abubakar",
+          icon: emoji,
+        })
+        .returning({ inseredId: Budgets.id });
+      if (result) {
+        toast("New Budget created !!");
         handleBudgetUpdate();
         onClose();
       }
@@ -61,11 +81,32 @@ const NewBudgetModal: React.FC<NewBudgetModalProps> = ({ isOpen, onClose ,handle
     }
   };
 
+  const handleUpdate = async (values:FormValues) => {
+    setLoading(true);
+    try{
+      const result  = await db.update(Budgets).set({
+        name: values.budgetName,
+        amount: values.budgetPrice,
+        icon: emoji,
+      }).where(eq(Budgets.id,budgetsData.id)).returning();
+      if (result) {
+        toast("Budget updated !!");
+        handleBudgetUpdate();
+        onClose();
+      }
+    } catch(err){
+      toast(`Error: ${err}`);
+    } finally {
+      setLoading(false);
+    }
+   
+  };
+
   return (
     <Formik
       initialValues={initialValues}
       validationSchema={validationSchema}
-      onSubmit={onSubmit}
+      onSubmit={budgetsData ? handleUpdate : handleAddBudget}
     >
       {({ errors, touched, handleChange, values }) => (
         <Form>
@@ -128,7 +169,11 @@ const NewBudgetModal: React.FC<NewBudgetModalProps> = ({ isOpen, onClose ,handle
               />
 
               <Button type="submit" disabled={loading}>
-                {loading ? <Loader /> : "Create Budget"}
+                {loading ? (
+                  <Loader />
+                ) : (
+                  `${budgetsData ? "Update Budget" : "Create Budget"}`
+                )}
               </Button>
             </div>
           </div>

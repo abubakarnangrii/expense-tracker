@@ -1,5 +1,5 @@
 "use client";
-import { BeerIcon } from "lucide-react";
+import { Trash2Icon } from "lucide-react";
 import React from "react";
 import { db } from "../../utils/dbConfig";
 import { Expenses } from "../../utils/scheme";
@@ -71,7 +71,7 @@ const ExpensesTable: React.FC<ExpansesTableProps> = ({
                   {expanse.createdAt}
                 </td>
                 <td className="whitespace-nowrap px-4 py-2 text-red-500">
-                  <BeerIcon
+                  <Trash2Icon
                     size="24"
                     onClick={() => {
                       handleDelete(expanse);
