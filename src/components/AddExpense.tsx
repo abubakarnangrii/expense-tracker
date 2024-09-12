@@ -6,29 +6,42 @@ import * as Yup from "yup";
 import { Formik, Form } from "formik";
 import Button from "./Button";
 import Loader from "./Loader";
-import EmojiPicker from "emoji-picker-react";
 import { Budgets, Expenses } from "../../utils/scheme";
 import { db } from "../../utils/dbConfig";
 import { toast } from "sonner";
 import moment from "moment";
+import { eq } from "drizzle-orm";
 
 interface FormValues {
   expenseName: string;
   expensePrice: string;
 }
 
-interface AddExpenseProps{ 
-  budgetId: number; 
-  refreshBudget: () => void ;
-  refreshExpanses: () => void ;
+interface Budget {
+  id: number;
+  name: string;
+  amount: number; 
+  icon: string | null;
+  createdBy: string;
+  totalSpend: number;
+  totalItem: number;
+}
+
+interface AddExpenseProps {
+  budgetId: number;
+  refreshBudget: () => void;
+  refreshExpanses: () => void;
+  budgetsData: Budget;
 }
 
 const AddExpense: React.FC<AddExpenseProps> = ({
   budgetId,
   refreshBudget,
-  refreshExpanses
+  refreshExpanses,
+  budgetsData,
 }) => {
   const [loading, setLoading] = useState<boolean>(false);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   const initialValues: FormValues = {
     expenseName: "",
@@ -37,12 +50,32 @@ const AddExpense: React.FC<AddExpenseProps> = ({
 
   const validationSchema = Yup.object({
     expenseName: Yup.string().required("Expense name is required"),
-    expensePrice: Yup.number().required("Expense price is required"),
+    expensePrice: Yup.number()
+      .required("Expense price is required")
+      .positive("Expense price must be a positive number")
+      .integer("Expense price must be an integer"),
   });
 
   const onSubmit = async (values: FormValues) => {
     setLoading(true);
+    setErrorMessage(null); 
     try {
+      const totalExpensesResult = await db
+        .select()
+        .from(Expenses)
+        .where(eq(Expenses.budgetId, budgetId));
+        
+      const currentTotalExpenses = totalExpensesResult.reduce(
+        (total, expense) => total + parseFloat(expense.amount),
+        0
+      );
+      const newExpenseAmount = parseFloat(values.expensePrice);
+      const updatedTotalExpenses = currentTotalExpenses + newExpenseAmount;
+
+      if (updatedTotalExpenses > budgetsData.amount) {
+        setErrorMessage("Adding this expense would exceed the budget amount.");
+        return; 
+      }
       const result = await db
         .insert(Expenses)
         .values({
@@ -51,13 +84,15 @@ const AddExpense: React.FC<AddExpenseProps> = ({
           budgetId: budgetId,
           createdAt: moment().format('DD/MM/YYYY'),
         })
-        .returning({ inseredId: Budgets.id });
+        .returning({ insertedId: Budgets.id });
+
       if (result) {
         console.log(JSON.stringify(result));
         toast("New Expense created");
         refreshBudget();
         refreshExpanses();
-        (values.expenseName = ""), (values.expensePrice = "");
+        values.expenseName = "";
+        values.expensePrice = "";
       }
     } catch (error) {
       toast(`Error: ${error}`);
@@ -78,6 +113,9 @@ const AddExpense: React.FC<AddExpenseProps> = ({
             <div className="flex justify-between items-center">
               <h2 className="text-xl font-semibold">Add Expense</h2>
             </div>
+
+            
+
             <GroupField
               label="Expense Name"
               name="expenseName"
@@ -111,6 +149,9 @@ const AddExpense: React.FC<AddExpenseProps> = ({
             <Button type="submit" disabled={loading}>
               {loading ? <Loader /> : "Add New Expense"}
             </Button>
+            {errorMessage && (
+              <div className="pb-2 pt-4 text-red-600">{errorMessage}</div>
+            )}
           </div>
         </Form>
       )}

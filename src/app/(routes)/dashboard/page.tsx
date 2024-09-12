@@ -7,22 +7,25 @@ import BudgetItem from "@/components/BudgetItem";
 import { desc, eq, getTableColumns, sql } from "drizzle-orm";
 import { Budgets, Expenses } from "../../../../utils/scheme";
 import { db } from "../../../../utils/dbConfig";
+import BarChartComponent from "@/components/BarChart";
 
 interface BudgetList {
   id: number;
   name: string;
   amount: string;
-  icon: string | null;
-  createdBy: string;
-  totalSpend: number;
-  totalItem: number;
+  icon?: string | null;
+  createdBy?: string;
+  totalSpend?: number;
+  totalItem?: number;
 }
 
 const Dashboard = () => {
   const [budgetList, setBudgetList] = useState<BudgetList[]>([]);
+  const [expansesList, setExpansesList] = useState<BudgetList[]>([]);
 
   useEffect(() => {
     getBudgets();
+    getAllExpense();
   }, []);
 
   const getBudgets = async () => {
@@ -49,6 +52,27 @@ const Dashboard = () => {
     }
   };
 
+  const getAllExpense = async () => {
+    try {
+      const result = await db.select({
+        id: Expenses.id,
+        amount: Expenses.amount,
+        name: Expenses.name,
+        createdAt: Expenses.createdAt,
+      })
+      .from(Budgets)
+      .rightJoin(Expenses, eq(Budgets.id, Expenses.budgetId))
+      .where(eq(Budgets.createdBy, "abubakar"))
+      .orderBy(desc(Expenses.id));
+  
+      if (result) {
+        setExpansesList(result);
+      }
+    } catch (error) {
+      console.error("Error fetching expenses:", error);
+    }
+  }
+  
   return (
     <div>
       <div className="p-4">
@@ -60,17 +84,18 @@ const Dashboard = () => {
         <MenuCard budget={budgetList} />
       </div>
 
-      <div className="p-4 flex justify-between items-start flex-col lg:flex-row w-full gap-5">
-        <div className="w-full lg:w-[60%]">
-          <div>
-            <h1 className="text-xl font-semibold pb-3">Graph</h1>
+      <div className="p-4 grid grid-cols-1 lg:grid-cols-3 gap-x-4 ">
+        <div className="col-span-2 ">
+          <div className="p-5 border rounded">
+            <h1 className="text-xl font-semibold pb-3">Activity</h1>
+            <BarChartComponent budgetList={budgetList} />
           </div>
-          <div>
+          <div className="py-4">
             <h1 className="text-xl font-semibold pb-3">Latest Expenses</h1>
-            <ExpensesTable />
+            <ExpensesTable expenses={expansesList} refreshTable={getAllExpense}/>
           </div>
         </div>
-        <div className="w-full lg:w-[40%]">
+        <div className="col-span-1">
           <h1 className="text-xl font-semibold pb-3">Latest Budgets</h1>
           {budgetList?.length > 0
             ? budgetList.map((budget) => (

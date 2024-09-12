@@ -4,10 +4,10 @@ import { PiggyBank, ReceiptText, Wallet } from "lucide-react";
 import { index } from "drizzle-orm/mysql-core";
 
 interface MenuCardProps {
-  budget: BudgetList[];
+  budget: Budget[];
 }
 
-interface BudgetList {
+interface Budget{
   id: number;
   name: string;
   amount: string;

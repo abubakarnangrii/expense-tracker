@@ -33,8 +33,8 @@ interface Budget {
 const ExpensesItem: React.FC = ({ params }) => {
   const router = useRouter();
   const { id } = params;
-  const [budgetsData, setBudgetsData] = useState<Budget>();
-  const [expensesData, setExpensesData] = useState();
+  const [budgetsData, setBudgetsData] = useState<Budget>({});
+  const [expensesData, setExpensesData] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [EditModalOpen, setEditModalOpen] = useState<boolean>(false);
 
@@ -174,6 +174,7 @@ const ExpensesItem: React.FC = ({ params }) => {
         )}
         <AddExpense
           budgetId={id}
+          budgetsData={budgetsData}
           refreshBudget={() => getBudgetInfo()}
           refreshExpanses={getExpanseList}
         />
