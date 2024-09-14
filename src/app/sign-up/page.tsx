@@ -84,7 +84,7 @@ const Register: React.FC = () => {
               <p className="mt-4 leading-relaxed text-white/90">
                 Welcome to our Expense Tracker App! To begin managing your
                 finances effectively and effortlessly, please create an account.
-                It’s quick and easy—just fill out the form below to get started.
+                It&apos;s quick and easy—just fill out the form below to get started.
               </p>
             </div>
           </section>
@@ -105,7 +105,7 @@ const Register: React.FC = () => {
                 <p className="mt-4 leading-relaxed text-black/90">
                   Welcome to our Expense Tracker App! To begin managing your
                   finances effectively and effortlessly, please create an
-                  account. It’s quick and easy—just fill out the form below to
+                  account. It&apos;s quick and easy—just fill out the form below to
                   get started.
                 </p>
               </div>

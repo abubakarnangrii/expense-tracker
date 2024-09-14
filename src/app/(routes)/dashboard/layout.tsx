@@ -34,6 +34,7 @@ export default function DashboardLayout({
 
   const createUserBudget = async () => {
     try {
+      if (!user) return;
       const result = await db
         .select()
         .from(Budgets)

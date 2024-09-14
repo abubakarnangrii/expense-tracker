@@ -69,6 +69,7 @@ const ExpensesItem: React.FC<ExpensesItemProps> = ({ params }) => {
 
   const getBudgetInfo = async () => {
     try {
+      if (!user) return;
       const result = await db
         .select({
           ...getTableColumns(Budgets),
@@ -98,6 +99,7 @@ const ExpensesItem: React.FC<ExpensesItemProps> = ({ params }) => {
 
   const getExpanseList = async () => {
     try {
+      if (!user) return;
       const result = await db
         .select()
         .from(DbExpenses)
