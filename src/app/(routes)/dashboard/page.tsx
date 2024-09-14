@@ -48,6 +48,7 @@ const Dashboard: React.FC = () => {
 
   const getBudgets = async () => {
     try {
+      if (!user) return;
       const result = await db
         .select({
           ...getTableColumns(Budgets),
@@ -70,6 +71,7 @@ const Dashboard: React.FC = () => {
 
   const getAllExpense = async () => {
     try {
+      if (!user) return;
       const result = await db.select({
         id: Expenses.id,
         amount: Expenses.amount,
@@ -84,6 +86,7 @@ const Dashboard: React.FC = () => {
       if (result) {
         setExpansesList(result);
       }
+    
     } catch (error) {
       console.error("Error fetching expenses:", error);
     }

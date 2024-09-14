@@ -49,6 +49,7 @@ const Budget: React.FC = () => {
 
   const getBudgets = async () => {
     try {
+      if (!user) return;
         const result = await db
           .select({
             ...getTableColumns(Budgets),

@@ -96,11 +96,12 @@ const NewBudgetModal: React.FC<NewBudgetModalProps> = ({
   const handleUpdate = async (values:FormValues) => {
     setLoading(true);
     try{
+      if(!budgetsData) return;
       const result  = await db.update(Budgets).set({
         name: values.budgetName,
         amount: values.budgetPrice,
         icon: emoji,
-      }).where(eq(Budgets.id,budgetsData.id)).returning();
+      }).where(eq(Budgets.id,budgetsData?.id)).returning();
       if (result) {
         toast("Budget updated !!");
         handleBudgetUpdate();

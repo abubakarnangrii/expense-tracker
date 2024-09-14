@@ -34,6 +34,7 @@ const Expense: React.FC = () => {
 
   const getAllExpense = async () => {
     try {
+      if (!user) return;
       const result = await db.select({
         id: DbExpenses.id,
         amount: DbExpenses.amount,
