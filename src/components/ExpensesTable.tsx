@@ -6,16 +6,15 @@ import { Expenses } from "../../utils/scheme";
 import { eq } from "drizzle-orm";
 import { toast } from "sonner";
 
-interface Expanses {
+interface Expenses {
   id: number;
   name: string;
   amount: string;
-  createdAt: string;
-  budgetId: number;
+  createdAt?: string;
 }
 
 interface ExpansesTableProps {
-  expenses: Expanses[];
+  expenses: Expenses[];
   refreshTable: () => void;
 }
 
@@ -23,7 +22,7 @@ const ExpensesTable: React.FC<ExpansesTableProps> = ({
   expenses,
   refreshTable,
 }) => {
-  const handleDelete = async (expense: Expanses) => {
+  const handleDelete = async (expense: Expenses) => {
     try {
       const result = await db
         .delete(Expenses)
@@ -58,8 +57,8 @@ const ExpensesTable: React.FC<ExpansesTableProps> = ({
             </tr>
           </thead>
 
-          <tbody className="divide-y divide-gray-200">
-            {expenses?.map((expanse: Expanses) => (
+          <tbody className="divide-y divide-gray-200 bg-primary/10">
+            {expenses?.map((expanse: Expenses) => (
               <tr key={expanse.id}>
                 <td className="whitespace-nowrap px-4 py-2 font-medium text-gray-900">
                   {expanse.name}

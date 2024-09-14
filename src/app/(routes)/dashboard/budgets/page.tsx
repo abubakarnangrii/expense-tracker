@@ -9,12 +9,13 @@ import { desc, eq, getTableColumns, sql } from "drizzle-orm";
 import { Budgets, Expenses } from "../../../../../utils/scheme";
 import Loader from "@/components/Loader";
 import Breadcrumb from "@/components/Breadcrumb";
+import { useUser } from "@/components/Context";
 
-interface BudgetList {
+interface Budgets {
   id: number;
   name: string;
   amount: string;
-  icon: string | null;
+  icon?: string | null;
   createdBy: string;
   totalSpend: number;
   totalItem: number;
@@ -22,7 +23,17 @@ interface BudgetList {
 
 const Budget: React.FC = () => {
   const [budgetsModel, setBudgetsModel] = useState<boolean>(false);
-  const [budgetList, setBudgetList] = useState<BudgetList[]>([]);
+  const [budgetList, setBudgetList] = useState<Budgets[]>([]);
+  const [user,setUser]  = useState<string>("");
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const storedUser = localStorage.getItem('userEmail');
+      if (storedUser) {
+        setUser(storedUser);
+      }
+    }
+  }, []);
 
   const handleNewBudget = () => {
     setBudgetsModel(true);
@@ -38,20 +49,20 @@ const Budget: React.FC = () => {
 
   const getBudgets = async () => {
     try {
-      const result = await db
-        .select({
-          ...getTableColumns(Budgets),
-          totalSpend: sql`SUM(CAST(${Expenses.amount} AS numeric))`.mapWith(Number),
-          totalItem: sql`COUNT(${Expenses.id})`.mapWith(Number),
-        })
-        .from(Budgets)
-        .leftJoin(Expenses, eq(Budgets.id, Expenses.budgetId))
-        .where(eq(Budgets.createdBy, "abubakar"))
-        .groupBy(Budgets.id).orderBy(desc(Budgets.id));
+        const result = await db
+          .select({
+            ...getTableColumns(Budgets),
+            totalSpend: sql`SUM(CAST(${Expenses.amount} AS numeric))`.mapWith(Number),
+            totalItem: sql`COUNT(${Expenses.id})`.mapWith(Number),
+          })
+          .from(Budgets)
+          .leftJoin(Expenses, eq(Budgets.id, Expenses.budgetId))
+          .where(eq(Budgets.createdBy,user))
+          .groupBy(Budgets.id).orderBy(desc(Budgets.id));
 
-      if (result) {
-        setBudgetList(result);
-      }
+        if (result) {
+          setBudgetList(result);
+        }
     } catch (error) {
       console.error("Error fetching budgets:", error); // Error handling
     }
@@ -73,7 +84,7 @@ const Budget: React.FC = () => {
           <h2 className="text-base font-medium mt-2">Create New Budget</h2>
         </div>
         {budgetList?.length>0 ? (budgetList.map((budget) => (
-          <ExpenseCard key={budget.id} budget={budget} /> // Pass budget data to ExpenseCard
+          <ExpenseCard key={budget.id} budget={budget} /> 
         ))):(
         [1,2,3,4.5].map((item,index)=>(
           <div key={index} className=" w-full bg-slate-200 rounded h-[150px] animate-pulse">

@@ -1,10 +1,11 @@
 "use client";
 import React, { useState } from "react";
-import { LayoutGrid, PiggyBank, ReceiptText, ShieldCheck, Menu, X } from "lucide-react"; // Import icons from lucide-react
-import { usePathname } from "next/navigation";
+import { LayoutGrid, PiggyBank, ReceiptText, ShieldCheck, Menu, X } from "lucide-react";
+import { usePathname, useRouter } from "next/navigation";
 
 const DashboardHeader: React.FC = () => {
   const pathname = usePathname();
+  const router = useRouter();
   const menuList = [
     {
       id: 1,
@@ -36,15 +37,26 @@ const DashboardHeader: React.FC = () => {
 
   const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
 
+  const handleLogout = () => {
+    localStorage.removeItem("userEmail");
+    router.replace("/");
+  };
   return (
-    <div className="p-5 shadow-sm border-b bg-white dark:bg-gray-800">
+    <div className=" p-5 shadow-sm border-b bg-white dark:bg-gray-800 w-full relative">
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold mr-4">Dashboard</h1>
         <button
           className="block md:hidden text-gray-600 dark:text-gray-300"
           onClick={toggleMenu}
         >
-          {isMenuOpen ? <X size={24}  /> : <Menu size={24} />}
+          {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
+        </button>
+        <button
+          type="submit"
+          onClick={handleLogout}
+          className="hidden md:block py-2 px-6  bg-red-500 text-white rounded hover:bg-red-600"
+        >
+          Logout
         </button>
       </div>
 
@@ -61,8 +73,9 @@ const DashboardHeader: React.FC = () => {
           {menuList.map((menu) => (
             <li key={menu.id}>
               <a
-                className={`flex items-center gap-4 py-5 px-6 mb-2 font-medium hover:text-primary cursor-pointer rounded  hover:bg-primary/20 ${pathname === menu.path
-                  && "text-primary bg-primary/20"}`}
+                className={`flex items-center gap-4 py-5 px-6 mb-2 font-medium hover:text-primary cursor-pointer rounded hover:bg-primary/20 ${
+                  pathname === menu.path && "text-primary bg-primary/20"
+                }`}
                 href={menu.path}
                 onClick={() => setIsMenuOpen(false)}
               >
@@ -71,10 +84,17 @@ const DashboardHeader: React.FC = () => {
               </a>
             </li>
           ))}
+          <li>
+            <button
+              type="submit"
+              onClick={handleLogout}
+              className="w-full py-2 px-6 mt-4 bg-red-500 text-white rounded hover:bg-red-600"
+            >
+              Logout
+            </button>
+          </li>
         </ul>
       </div>
-
-     
     </div>
   );
 };

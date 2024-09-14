@@ -5,7 +5,7 @@ interface Budget {
   id: number;
   name: string;
   amount: string;
-  icon: string | null;
+  icon?: string | null;
   createdBy: string;
   totalSpend: number;
   totalItem: number;
@@ -60,7 +60,7 @@ const BudgetItem: React.FC<BudgetItemProps> = ({ budget,className }) => {
                 className="bg-primary h-2 rounded-full"
                 style={{
                   width: `${
-                    (budget.totalSpend / Number(budget.amount)) * 100
+                    (budget?.totalSpend / Number(budget.amount)) * 100
                   }%`,
                 }}
               ></div>

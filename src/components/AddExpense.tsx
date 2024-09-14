@@ -20,18 +20,18 @@ interface FormValues {
 interface Budget {
   id: number;
   name: string;
-  amount: number; 
+  amount: string; 
   icon: string | null;
-  createdBy: string;
-  totalSpend: number;
-  totalItem: number;
+  createdBy?: string;
+  totalSpend?: number;
+  totalItem?: number;
 }
 
 interface AddExpenseProps {
-  budgetId: number;
+  budgetId: string|number;
   refreshBudget: () => void;
   refreshExpanses: () => void;
-  budgetsData: Budget;
+  budgetsData:Budget | undefined;
 }
 
 const AddExpense: React.FC<AddExpenseProps> = ({
@@ -40,6 +40,7 @@ const AddExpense: React.FC<AddExpenseProps> = ({
   refreshExpanses,
   budgetsData,
 }) => {
+  const numericId = typeof budgetId === 'string' ? parseInt(budgetId, 10) : budgetId;
   const [loading, setLoading] = useState<boolean>(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
@@ -63,7 +64,7 @@ const AddExpense: React.FC<AddExpenseProps> = ({
       const totalExpensesResult = await db
         .select()
         .from(Expenses)
-        .where(eq(Expenses.budgetId, budgetId));
+        .where(eq(Expenses.budgetId, numericId));
         
       const currentTotalExpenses = totalExpensesResult.reduce(
         (total, expense) => total + parseFloat(expense.amount),
@@ -72,7 +73,8 @@ const AddExpense: React.FC<AddExpenseProps> = ({
       const newExpenseAmount = parseFloat(values.expensePrice);
       const updatedTotalExpenses = currentTotalExpenses + newExpenseAmount;
 
-      if (updatedTotalExpenses > budgetsData.amount) {
+      let amount = Number(budgetsData?.amount)
+      if (updatedTotalExpenses > amount ) {
         setErrorMessage("Adding this expense would exceed the budget amount.");
         return; 
       }
@@ -81,7 +83,7 @@ const AddExpense: React.FC<AddExpenseProps> = ({
         .values({
           name: values.expenseName,
           amount: values.expensePrice,
-          budgetId: budgetId,
+          budgetId: numericId,
           createdAt: moment().format('DD/MM/YYYY'),
         })
         .returning({ insertedId: Budgets.id });

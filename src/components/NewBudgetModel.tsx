@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { X } from "lucide-react";
 import GroupField from "./GroupField";
 import * as Yup from "yup";
@@ -16,11 +16,12 @@ interface Budget {
   id: number;
   name: string;
   amount: string;
-  icon: string | null;
+  icon?: string | null;
   createdBy: string;
   totalSpend: number;
   totalItem: number;
 }
+
 interface NewBudgetModalProps {
   isOpen: boolean;
   onClose: () => void;
@@ -42,8 +43,19 @@ const NewBudgetModal: React.FC<NewBudgetModalProps> = ({
   const [loading, setLoading] = useState<boolean>(false);
   const [emojiOpen, setEmojiOpen] = useState<boolean>(false);
   const [emoji, setEmoji] = useState<string | null>(
-    budgetsData ? budgetsData?.icon : "🥰"
+    budgetsData?.icon ? budgetsData?.icon : "🥰"
   );
+  const [user,setUser]  = useState<string>("");
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const storedUser = localStorage.getItem('userEmail');
+      if (storedUser) {
+        setUser(storedUser);
+      }
+    }
+  }, []);
+
 
   if (!isOpen) return null;
 
@@ -65,7 +77,7 @@ const NewBudgetModal: React.FC<NewBudgetModalProps> = ({
         .values({
           name: values.budgetName,
           amount: values.budgetPrice,
-          createdBy: "abubakar",
+          createdBy: user,
           icon: emoji,
         })
         .returning({ inseredId: Budgets.id });

@@ -11,16 +11,16 @@ interface Budget{
   id: number;
   name: string;
   amount: string;
-  icon: string | null;
-  createdBy: string;
-  totalSpend: number;
-  totalItem: number;
+  icon?: string | null |undefined;
+  createdBy?: string;
+  totalSpend?: number;
+  totalItem?: number;
 }
 
 const MenuCard: React.FC<MenuCardProps> = ({ budget }) => {
-  const [totalBudget, setTotalBudget] = useState(0);
-  const [totalSpend, setTotalSpend] = useState(0);
-  const [totalItem, setTotalItem] = useState(0);
+  const [totalBudget, setTotalBudget] = useState<number>(0);
+  const [totalSpend, setTotalSpend] = useState<number>(0);
+  const [totalItem, setTotalItem] = useState<number>(0);
 
   useEffect(() => {
     CalculateBudget();
@@ -29,12 +29,10 @@ const MenuCard: React.FC<MenuCardProps> = ({ budget }) => {
   const CalculateBudget = () => {
     let budgetTotal = 0;
     let spendTotal = 0;
-    let itemTotal = 0;
 
     budget?.forEach((item) => {
       budgetTotal += Number(item.amount);
       spendTotal += Number(item.totalSpend);
-      itemTotal += item.totalItem;
     });
 
     setTotalBudget(budgetTotal);

@@ -1,7 +1,7 @@
 import Link from "next/link";
 import React from "react";
 
-const Breadcrumb = ({ name,link }) => {
+const Breadcrumb:React.FC<{name:string,link:string}> = ({ name,link }) => {
   return (
     <nav aria-label="Breadcrumb">
       <ol className="flex items-center gap-1 text-sm text-gray-600">

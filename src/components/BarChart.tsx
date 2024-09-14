@@ -4,11 +4,11 @@ import { BarChart, CartesianGrid, XAxis, YAxis, Tooltip, Legend, Bar, Responsive
 interface Budget {
   id: number;
   name: string;
-  amount: number; // Ensure this is a number for proper scaling
-  icon: string | null;
-  createdBy: string;
-  totalSpend: number; // Ensure this is a number as well
-  totalItem: number;
+  amount: string; // Ensure this is a number for proper scaling
+  icon?: string | null;
+  createdBy?: string;
+  totalSpend?: number; // Ensure this is a number as well
+  totalItem?: number;
 }
 
 interface BarChartComponentProps {
