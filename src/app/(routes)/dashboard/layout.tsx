@@ -1,13 +1,12 @@
-"use client";
-
-import SideNav from "../../../components/SideNav";
-import DashboardHeader from "@/components/DashboardHeader";
-import { db } from "../../../../utils/dbConfig";
-import { useUser } from "@clerk/nextjs";
-import { useEffect } from "react";
-import { eq } from "drizzle-orm";
-import { Budgets } from "../../../../utils/scheme"; // Make sure to import Budgets
-import { useRouter } from "next/navigation";
+'use client'
+import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
+import SideNav from '../../../components/SideNav';
+import DashboardHeader from '@/components/DashboardHeader';
+import { db } from '../../../../utils/dbConfig';
+import { eq } from 'drizzle-orm';
+import { Budgets } from '../../../../utils/scheme';
+import Loader from '@/app/loading'; // Import the Loader component
 
 export default function DashboardLayout({
   children,
@@ -15,29 +14,46 @@ export default function DashboardLayout({
   children: React.ReactNode;
 }>) {
   const router = useRouter();
-  const { user, isLoaded } = useUser(); // Destructure user and isLoaded
+  const [user, setUser] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true); // Added loading state
 
   useEffect(() => {
-    if (isLoaded && user) {
+    const storedUser = localStorage.getItem('userEmail');
+    if (!storedUser) {
+      router.replace('/sign-in');
+      return;
+    }
+    setUser(storedUser);
+  }, [router]);
+
+  useEffect(() => {
+    if (user) {
       createUserBudget();
     }
-  }, [isLoaded, user]); // Add isLoaded as a dependency
+  }, [user]);
 
   const createUserBudget = async () => {
     try {
       const result = await db
         .select()
         .from(Budgets)
-        .where(eq(Budgets.createdBy, user.primaryEmailAddress.emailAddress));
+        .where(eq(Budgets.createdBy, user));
 
       if (result?.length === 0) {
-        router.replace("/dashboard/budgets");
+        router.replace('/dashboard/budgets');
+      } else {
+        router.replace('/dashboard');
       }
     } catch (error) {
-      console.error("Failed to fetch budgets:", error);
-      // Handle errors, maybe redirect to an error page or show a notification
+      console.error('Failed to fetch budgets:', error);
+    } finally {
+      setLoading(false); // Set loading to false after operation completes
     }
   };
+
+  if (loading) {
+    return <Loader />; // Render the Loader while loading
+  }
 
   return (
     <div className="flex justify-start items-start flex-row">

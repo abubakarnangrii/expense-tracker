@@ -1,12 +1,11 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
-import { ClerkProvider, RedirectToSignIn } from "@clerk/nextjs";
 import { Toaster } from "@/components/ui/sonner";
 
 const inter = Inter({
-  subsets: ["latin"], // Specify the subsets you need
-  weight: ["400", "700"], // Specify the weights you need
+  subsets: ["latin"], 
+  weight: ["400", "700"], 
 });
 
 export const metadata: Metadata = {
@@ -22,10 +21,8 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={inter.className}>
-        <ClerkProvider>
           <Toaster />
           {children}
-        </ClerkProvider>
       </body>
     </html>
   );

@@ -30,7 +30,7 @@ const Hero = () => {
         
         </div>
       </div>
-      <Image src="/images/dashboard.jpg" alt="Dashboard" width={1000} height={700} className='mt-10 rounded-xl border-2' />
+      <Image src="/images/expanse-tracker.png" alt="Dashboard" width={1000} height={700} className='mt-10 rounded-xl border-2' />
     </section>
   );
 };

@@ -1,5 +1,4 @@
 import { integer, pgTable,serial, varchar } from "drizzle-orm/pg-core";
-import { Icon } from "lucide-react";
 
 export const Budgets = pgTable('budgets', {
     id: serial('id').primaryKey(),

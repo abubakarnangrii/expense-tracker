@@ -5,9 +5,12 @@ import { LayoutGrid, PiggyBank, ReceiptText, ShieldCheck } from "lucide-react";
 import { usePathname } from "next/navigation";
 import Link from "next/link";
 import path from "path";
+import Button from "./Button";
+import Loader from "./Loader";
 
 const SideNav = () => {
   const pathname = usePathname();
+  const [loading, setLoading] = React.useState<boolean>(false);
   const menuList = [
     {
       id: 1,
@@ -35,9 +38,9 @@ const SideNav = () => {
     },
   ];
   return (
-    <div className=" py-5 px-2  dark:bg-boxdark-2/50 h-screen shadow-sm">
+    <div className=" py-5 px-2  dark:bg-boxdark-2/50 h-screen shadow-md border border-slate-50">
       <div className="flex justify-center items-center ">
-        <Image src={"/logo.svg"} alt="logo" width={130} height={50} />
+        <Image src={"/logo.svg"} alt="logo" width={150} height={50} />
       </div>
       <div className="py-6">
         {menuList.map((menu) => (
@@ -53,9 +56,7 @@ const SideNav = () => {
           </Link>
         ))}
       </div>
-      <div className="fixed bottom-10 flex gap-2 p-5 items-center">
-        <p>user</p>
-      </div>
+      
     </div>
   );
 };
